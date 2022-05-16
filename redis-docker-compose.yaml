@@ -1,0 +1,29 @@
+version: '3'
+services:
+  redis:
+    image: redis:4
+    container_name: redis
+    network_mode: bridge
+    restart: always
+    volumes:
+       - /data/redis-[outPort]/:/data
+    environment:
+       - TZ=Asia/Shanghai
+       - extra_hosts="[172.16.100.3:7001-7003,172.16.100.4:7001-7003]"
+       - extra_env="[volTag=outPort,testEnv1=xxx-host,testEnv2=xxx-outPort,testEnv3=xxx-host-outPort]"
+    command: [
+      "bash", "-c",
+      '
+       docker-entrypoint.sh
+       --requirepass "redis-pwd"
+       --appendonly yes
+      '
+    ]
+    ports:
+      - "6379:6379"
+    logging:
+      options:
+        max-size: '100m'
+        max-file: '10'
+    extra_hosts:
+      - "x.y.z:127.0.0.1"
