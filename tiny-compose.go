@@ -1103,8 +1103,8 @@ func getAuth(imageStr string) types.ImagePullOptions {
 		}
 	}
 	authConfig := types.AuthConfig{
-		Username: "xxx",
-		Password: "xxx",
+		Username: "",
+		Password: "",
 	}
 	encodedJSON, err := json.Marshal(authConfig)
 	if err != nil {

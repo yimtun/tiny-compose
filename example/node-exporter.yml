@@ -1,0 +1,20 @@
+version: '3.2'
+services:
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: "node-exporter"
+    restart: unless-stopped    
+    privileged: true
+    network_mode: "host"
+    environment:
+      - extra_hosts="[172.16.100.3,172.16.100.4]"
+    command:
+      - '--path.procfs=/host/proc'      
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.textfile.directory=/node_exporter/prom'    
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro

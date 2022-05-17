@@ -1,0 +1,33 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0.26
+    network_mode: bridge
+    privileged: true
+    container_name: mysql
+    restart: always
+    volumes:
+      - /data/mysql/data:/var/lib/mysql
+      - /data/mysql/log:/var/log:rw
+    ports:
+      - 3306:3306
+      - 33060:33060
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=root@123
+      - extra_hosts="[172.16.100.3,172.16.100.4]"
+
+    command: 
+     --default-authentication-plugin=mysql_native_password 
+     --lower-case-table-names=1
+     --character-set-server=utf8mb4
+     --collation-server=utf8mb4_general_ci
+     --max_allowed_packet=128M;
+     --explicit_defaults_for_timestamp=true
+     --max_connections=1500
+     --skip-name-resolve=1
+     --group_concat_max_len=102400
+    logging:
+      options:
+        max-size: "100m"
+        max-file: "10"
