@@ -292,7 +292,6 @@ func tconfig(hconfig *viper.Viper) {
 }
 
 func GetConfigFromYml() {
-	// 读取docker-compose 文件 读取路径为: ./docker-compose-configs/jingyin-backend-docker-compose.yml
 	//dockerCompose := appName + "-docker-compose"
 
 	config := viper.New()
