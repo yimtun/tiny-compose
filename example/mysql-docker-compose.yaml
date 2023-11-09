@@ -15,7 +15,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - MYSQL_ROOT_PASSWORD=root@123
-      - extra_hosts="[172.16.100.3,172.16.100.4]"
+      - extra_hosts="[10.202.11.78,10.202.11.79]"
 
     command: 
      --default-authentication-plugin=mysql_native_password 

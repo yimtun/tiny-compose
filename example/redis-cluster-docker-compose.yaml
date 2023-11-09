@@ -9,7 +9,7 @@ services:
        - /data/redis-[outPort]/:/data
     environment:
        - TZ=Asia/Shanghai
-       - extra_hosts="[10.202.11.78:7001-7003,10.202.11.79:7004-7006]"
+       - extra_hosts="[10.211.55.6:7001-7006]"
        - extra_env="[volTag=outPort,testEnv1=xxx-host,testEnv2=xxx-outPort,testEnv3=xxx-host-outPort]"
     command: [
       "bash", "-c",

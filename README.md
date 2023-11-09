@@ -187,6 +187,101 @@ services:
 
 
 
+```yaml
+yum install docker-ce-3:19.03.13
+```
+
+
+# 可选 阿里镜像
+
+```bash
+cat > /etc/docker/daemon.json  << EOF
+{
+  "registry-mirrors": ["https://2xdz2l32.mirror.aliyuncs.com"]
+}
+EOF
+```
+
+
+# 清理测试环境
+
+```bash
+docker stop $(docker ps -q)   
+docker rm $(docker ps -a -q)
+docker rmi $(docker images -q)
+```
+
+
+# 创建一个 三主三从redis 集群
+
+
+```bash
+redis-cli  -p 7001 -h 10.205.11.26 -a redis-pwd info
+```
+
+```bash
+docker exec -it redis7001 /bin/bash
+```
+
+```bash
+apt-get update
+```
+
+```
+redis-cli  -h 10.205.11.26 -p 7001  -a redis-pwd info
+```
+
+
+```bash
+redis-trib  create --replicas 1 \
+10.205.11.26:7001 \
+10.205.11.26:7002 \
+10.205.11.26:7003 \
+10.205.11.26:7004 \
+10.205.11.26:7005 \
+10.205.11.26:7006 
+```
 
 
 
+#### host 网络模式 单机单实例
+```bash 
+./tiny-compose  -f example/node-exporter.yml
+```
+
+
+### bridge 网络模式 加 暴露多端口   单机单示例 
+
+```bash
+./tiny-compose  -f example/mysql-docker-compose.yaml
+```
+
+
+### bridge 网络模式 单端口  支持单机多实例
+
+```bash
+./tiny-compose  -f example/redis-docker-compose.yaml
+```
+
+
+```bash
+sudo docker inspect redis7001 | jq  .[0].HostConfig.Binds
+[
+  "/data/redis-7001/:/data:rw"
+]
+```
+
+```
+sudo docker inspect redis7005 | jq  .[0].HostConfig.Binds
+[
+"/data/redis-7005/:/data:rw"
+]
+```
+
+
+
+###  创建3主3从集群 暂时不支持
+
+```bash
+./tiny-compose  -f example/redis-cluster-docker-compose.yaml 
+```

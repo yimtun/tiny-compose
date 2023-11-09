@@ -28,10 +28,6 @@ import (
 	"strings"
 )
 
-
-
-
-
 var certPath string //  docker 连接时自动判断是否使用证书
 var dockerComposeFileName string
 var dockerCompsoeFileDir string
@@ -85,9 +81,9 @@ func (a *tmpStruct) containerConfigFactory() {
 			deployHost:  "localhost",
 			capAdd:      a.capacityAdd,
 			privileged:  a.containerPrivileged,
-			logConfig: a.logConfig,
-			extraHosts: a.extraHosts,
-			tmpFs: a.tmpFs,
+			logConfig:   a.logConfig,
+			extraHosts:  a.extraHosts,
+			tmpFs:       a.tmpFs,
 		}
 		ymlConfigSlice = append(ymlConfigSlice, ymlconfig)
 	} else {
@@ -109,11 +105,9 @@ func (a *tmpStruct) containerConfigFactory() {
 					deployHost:  ip,
 					capAdd:      a.capacityAdd,
 					privileged:  a.containerPrivileged,
-					logConfig: a.logConfig,
-					extraHosts: a.extraHosts,
-					tmpFs: a.tmpFs,
-
-
+					logConfig:   a.logConfig,
+					extraHosts:  a.extraHosts,
+					tmpFs:       a.tmpFs,
 				}
 				ymlConfigSlice = append(ymlConfigSlice, ymlconfig)
 			} else {
@@ -146,11 +140,9 @@ func (a *tmpStruct) containerConfigFactory() {
 					deployHost:  ip,
 					capAdd:      a.capacityAdd,
 					privileged:  a.containerPrivileged,
-					logConfig: a.logConfig,
-					extraHosts: a.extraHosts,
-					tmpFs: a.tmpFs,
-
-
+					logConfig:   a.logConfig,
+					extraHosts:  a.extraHosts,
+					tmpFs:       a.tmpFs,
 				}
 				ymlConfigSlice = append(ymlConfigSlice, ymlconfig)
 			}
@@ -173,12 +165,10 @@ type tmpStruct struct {
 	containerSpecialPort  string
 	//
 
-
-	tmpFs            map[string]string // key 是 卷  value 是参数
-	logConfig        container.LogConfig
-	privileged       bool // 是否开启特权模式
-	extraHosts       []string
-
+	tmpFs      map[string]string // key 是 卷  value 是参数
+	logConfig  container.LogConfig
+	privileged bool // 是否开启特权模式
+	extraHosts []string
 }
 
 // 临时用日志配置
@@ -295,19 +285,15 @@ func GetConfigFromYml() {
 	//dockerCompose := appName + "-docker-compose"
 
 	config := viper.New()
-	config.AddConfigPath(dockerCompsoeFileDir)                                    //设置读取的文件路径
+	config.AddConfigPath(dockerCompsoeFileDir) //设置读取的文件路径
 	//config.SetConfigName(strings.Replace(dockerComposeFileName, ".yaml", "", -1)) //设置读取的文件名  去掉yaml 后缀
 
-
-	noyaml:=strings.Replace(dockerComposeFileName, ".yaml", "", -1) // 去掉yaml
-	noyml:=strings.Replace(noyaml,".yml","",-1)   // 去掉yml
-
+	noyaml := strings.Replace(dockerComposeFileName, ".yaml", "", -1) // 去掉yaml
+	noyml := strings.Replace(noyaml, ".yml", "", -1)                  // 去掉yml
 
 	config.SetConfigName(noyml)
 
-
-
-	config.SetConfigType("yaml")                                                  //设置文件的类型
+	config.SetConfigType("yaml") //设置文件的类型
 	//尝试进行配置读取
 	if err := config.ReadInConfig(); err != nil {
 		panic(err)
@@ -351,8 +337,7 @@ func GetConfigFromYml() {
 		//logConfigDriver := config.GetString("services." + svcName + ".logging" + ".driver")
 		privilegedStr := config.GetString("services." + svcName + ".Privileged")
 
-
-		fmt.Println("获取tmpfsslice",tmpfsSlice)
+		fmt.Println("获取tmpfsslice", tmpfsSlice)
 
 		//newTmpfs(tmpfsSlice)
 
@@ -371,7 +356,7 @@ func GetConfigFromYml() {
 		}
 
 		//   dockerComposeConfig 测试ok  确实tmpfs 支持
-		fmt.Println("获取tmpfs",newTmpfs(tmpfsSlice))
+		fmt.Println("获取tmpfs", newTmpfs(tmpfsSlice))
 		//dockerComposeConfig(getTarget(templateEnvSlice, multiInstancesOnSingleHost), name, image, templateEnvSlice, getPortMap(portSlice), volumeSlice, cmdSlice, networkmode, cadadd, getVolumeMap(volumeSlice), ifPrivileged(privilegedStr), getSpecialPort(portSlice), ExtraHosts, logConfig,newTmpfs(tmpfsSlice))
 
 		if 1 < 2 {
@@ -391,11 +376,9 @@ func GetConfigFromYml() {
 				containerPrivileged:   ifPrivileged(privilegedStr),
 				containerSpecialPort:  getSpecialPort(portSlice),
 				// 2022 04 14 add new
-				logConfig: logConfig,
+				logConfig:  logConfig,
 				extraHosts: ExtraHosts,
-				tmpFs: 	newTmpfs(tmpfsSlice),
-
-
+				tmpFs:      newTmpfs(tmpfsSlice),
 			}
 			a.containerConfigFactory()
 		}
@@ -445,8 +428,8 @@ func outConfig() { //装填 docker api 需要的元数据，并使用此数据 �
 		hostConfig := &container.HostConfig{
 			ExtraHosts: ymlC.extraHosts,
 			//Binds:      newBindsFromVolumeMap(ymlC.volumeMap),
-			Binds: newBindsFromVolumeSlice(ymlC.volumeSlice),
-			Tmpfs: ymlC.tmpFs,
+			Binds:        newBindsFromVolumeSlice(ymlC.volumeSlice),
+			Tmpfs:        ymlC.tmpFs,
 			Privileged:   ymlC.privileged,
 			CapAdd:       ymlC.capAdd,
 			PortBindings: portMap,
@@ -466,34 +449,44 @@ func outConfig() { //装填 docker api 需要的元数据，并使用此数据 �
 func deploy(host string, config *container.Config, hostConfig *container.HostConfig, name string) {
 
 	// 临时定义一个默认host 仅用于用于测试
-	if host == "localhost" {
-		host = "172.16.100.3"
-	}
+	//if host == "localhost" {
+	//	fmt.Println("连接主机:", host)
+	//	host = "10.205.11.26"
+	//
+	//}
 	// 创建容器 容器名字  容器内端口 镜像名字 目标宿主机 环境变量
 
 	ctx := context.Background()
 
 	var cli *client.Client
 
+	// 传入 host 返回 client  每个host 对应一行 连接配置 从 config.json 获取
 	if certPath == "" {
 
 		fmt.Println("证书路径为空")
-		connectUrl := "http://" + host + ":2375"
+		connectUrl := "tcp://" + host + ":2375"
+		fmt.Println("不加载证书 连接url:", connectUrl)
+
 		var err error
-		cli, err = client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.38"), client.WithHost(connectUrl))
+
+		//cli, err = client.NewClientWithOpts(client.WithHost(connectUrl), nil)
+		cli, err = client.NewClientWithOpts(client.WithHost(connectUrl), client.WithAPIVersionNegotiation())
+		if err != nil {
+			fmt.Println("http 连接出错", err)
+			//panic(err)
+		}
 
 		defer cli.Close()
-		if err != nil {
-			panic(err)
-		}
 
 	} else {
 
-		connectUrl := "http://" + host + ":2376"
+		connectUrl := "http://" + host + ":2375"
 		var err error
-		cli, err = client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.38"), client.WithHost(connectUrl), client.WithTLSClientConfig(certPath+"/ca.pem", certPath+"/client-certs/cert.pem", certPath+"/client-certs/key.pem"))
+		//cli, err = client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.38"), client.WithHost(connectUrl), client.WithTLSClientConfig(certPath+"/ca.pem", certPath+"/client-certs/cert.pem", certPath+"/client-certs/key.pem"),nil)
+		cli, err = client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.38"), client.WithHost(connectUrl), nil)
 		defer cli.Close()
 		if err != nil {
+			fmt.Println("连接出错", err)
 			panic(err)
 		}
 
@@ -508,6 +501,7 @@ func deploy(host string, config *container.Config, hostConfig *container.HostCon
 	// create 之前先删除
 	// 判断当前是否有运行 同名 容器
 
+	// 复用全局的cli
 	currentImageVersion := getVersionByName(cli, name)
 
 	if currentImageVersion != config.Image { // 如果当前运行的镜像 不等于目标镜像  就尝试创建容器  //  currentImageVersion 为空说明  指定容器名字的容器没有运行，同样需要创建
@@ -520,7 +514,6 @@ func deploy(host string, config *container.Config, hostConfig *container.HostCon
 		// 拉取镜像
 		pullImage(cli, config.Image)
 		err := pullImage(cli, config.Image)
-
 
 		if err != nil {
 			fmt.Println("err", err)
@@ -675,7 +668,7 @@ func getTemplateEnvSlice(originalEvnSlice, extraEvnSlice []string) []string {
 	return envTemplateSlice
 }
 
-func dockerComposeConfig(targetSlice []string, name string, image string, environmentSlice []string, portMap map[string]string, volumeSlice []string, cmdSlice []string, networkmode string, cadadd []string, volMap map[string]string, isPrivileged bool, specialPort string, extraHosts []string, logConfig container.LogConfig,tmpFs map[string]string) {
+func dockerComposeConfig(targetSlice []string, name string, image string, environmentSlice []string, portMap map[string]string, volumeSlice []string, cmdSlice []string, networkmode string, cadadd []string, volMap map[string]string, isPrivileged bool, specialPort string, extraHosts []string, logConfig container.LogConfig, tmpFs map[string]string) {
 	fmt.Println("specialPort", specialPort)
 
 	if len(targetSlice) == 0 { // 如果   targetSlice 长度为0 意味着是一个普通的 docker-compsoe 配置
@@ -693,7 +686,7 @@ func dockerComposeConfig(targetSlice []string, name string, image string, enviro
 			privileged:       isPrivileged,
 			extraHosts:       extraHosts,
 			logConfig:        logConfig,
-			tmpFs: tmpFs,
+			tmpFs:            tmpFs,
 		}
 		ymlConfigSlice = append(ymlConfigSlice, ymlconfig)
 	} else {
@@ -719,8 +712,7 @@ func dockerComposeConfig(targetSlice []string, name string, image string, enviro
 					privileged:       isPrivileged,
 					extraHosts:       extraHosts,
 					logConfig:        logConfig,
-					tmpFs: tmpFs,
-
+					tmpFs:            tmpFs,
 				}
 				ymlConfigSlice = append(ymlConfigSlice, ymlconfig)
 			} else {
@@ -755,8 +747,7 @@ func dockerComposeConfig(targetSlice []string, name string, image string, enviro
 					privileged:  isPrivileged,
 					extraHosts:  extraHosts,
 					logConfig:   logConfig,
-					tmpFs: tmpFs,
-
+					tmpFs:       tmpFs,
 				}
 				ymlConfigSlice = append(ymlConfigSlice, ymlconfig)
 			}
@@ -823,8 +814,8 @@ func newTmpfs(tmpfsSlice []string) map[string]string {
 	tmpfs := make(map[string]string)
 	// 判断是否有冒号 有冒号代表有挂载参数
 	for _, v := range tmpfsSlice {
-		tmpfsStr:= strings.Split(v, ":")
-		tmpfs[tmpfsStr[0]]=tmpfsStr[1]
+		tmpfsStr := strings.Split(v, ":")
+		tmpfs[tmpfsStr[0]] = tmpfsStr[1]
 	}
 	return tmpfs
 }
@@ -1000,7 +991,8 @@ func getVersionByName(cli *client.Client, name string) (currentVersion string) {
 
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
 	if err != nil {
-		panic(err)
+		fmt.Println("list 容器失败", err)
+		//panic(err)
 	}
 	for _, container := range containers {
 		if container.Names[0] == "/"+name {
@@ -1120,7 +1112,6 @@ func cmd() (cert string, filePath string) {
 	var file string
 	var auth string
 
-
 	// &user 就是接收用户命令行中输入的 -u 后面的参数值
 	// "u" ,就是 -u 指定参数
 	// "" , 默认值
@@ -1133,7 +1124,7 @@ func cmd() (cert string, filePath string) {
 	flag.Parse()
 	// 输出结果
 	if !Exists(file) {
-		fmt.Println(file, "不存在")
+		fmt.Println(file, "docker-compsoe 文件不存在")
 		os.Exit(0)
 
 	}
